@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>show content</title>
+    <link rel="stylesheet" href="form.css">
+</head>
+
+<body onload="myFunction()" class="table">
+    <div class="search">
+        <input type="text" name="" id="searchname" placeholder="search..." onkeyup="search()">
+    </div>
+    <div class="maintable">
+        <table id="tableContent">
+            <thead>
+                <tr class="th-color">
+                    <th>Sr.</th>
+                    <th>Firstname</th>
+                    <th>Lastname</th>
+                    <th>Fullname</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+
+            </tbody>
+        </table>
+    </div>
+    <div class="nextpage">
+        <a href="javascript:prevPage()" id="btn_prev">Prev</a>
+        <ul id="pages"></ul>
+        <a href="javascript:nextPage()" id="btn_next">Next</a>
+
+    </div>
+
+</body>
+
+<script>
+
+function search() {
+  // Get the user's input from the page
+  var searchQuery = document.getElementById('searchname').value;
+  // Get the item from LocalStorage
+  var localStorageItem = localStorage.getItem('users');
+  // Do your DOM manipulation magic
+  var elementValue = $('#MyTable')
+    .find('tr#key_' + localStorageItem)
+    .children('td.two')
+    .text();
+  console.log(elementValue);
+}
+
+    const searchFun = () => {
+        let filter = document.getElementById('searchname').value.toUpperCase();
+        let mytable = document.getElementById('tableContent');
+        let tr = mytable.getElementsByTagName('tr');
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName('td')[0];
+            if (td) {
+                var textvalue = td.textContent || td.innertext;
+                if (textvalue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = '';
+                } else {
+                    tr[i].style.display = 'none';
+                }
+            }
+        }
+    }
+
+    ///PAGINATION 
+    var data = localStorage.getItem('users') ? JSON.parse(localStorage.getItem('users')) : [];
+    var itemPerPage = 5;
+    var currentPage = 1;
+    var pages = Math.ceil(data.length / itemPerPage);
+
+    function changePage(page) {
+        var tabledata = "";
+        let lastName = "";
+
+        for (let i = (page - 1) * itemPerPage; i < (page * itemPerPage) && i < data.length; i++) {
+            if (data[i]['lastname'] == "") {
+                lastName = 'N/A';
+            }
+            else {
+                lastName = data[i]['lastname'];
+            }
+            tabledata +=
+                "<tr>" +
+                "<td>" + (i + 1) + "</td>" +
+                "<td>" + data[i]['name'].trim() + "</td>" +
+                "<td>" + lastName + "</td>" +
+                "<td>" + data[i]['name'] + ' ' + data[i]['lastname'] + "</td>" +
+                "<td>" + data[i]['email'] + "</td>" +
+                "<td>" + data[i]['phone'] + "</td>" +
+                "</tr>"
+        }
+        document.getElementById("table-body").innerHTML = tabledata;
+    }
+
+    function gotoPage(page) {
+        currentPage = page;
+        changePage(currentPage);
+
+    }
+
+    function nextPage() {
+        if (currentPage < pages) changePage(++currentPage);
+
+    }
+
+    function prevPage() {
+        if (currentPage > 1) changePage(--currentPage);
+    }
+
+    function addPage() {
+        var el = document.getElementById('pages')
+        // for each page
+        for (var i = 1; i < pages + 1; i++) {
+            // append a link with the respective page number
+            el.innerHTML += `<li onClick= gotoPage(${i}) > ${i} </li>`
+        }
+    }
+
+    window.onload = (event) => {
+        changePage(currentPage);
+        addPage();
+
+    }
+</script>
+
+</html>
